@@ -144,8 +144,10 @@ public class ZookeeperRegistry extends FailbackRegistry {
     @Override
     public void doSubscribe(final URL url, final NotifyListener listener) {
         try {
+            // 服务治理中心会处理所有service层的订阅，service被设置成特殊值*
             if (ANY_VALUE.equals(url.getServiceInterface())) {
                 String root = toRootPath();
+                // 如果该url下没有对应的监听器map，则申请一个监听器map
                 ConcurrentMap<NotifyListener, ChildListener> listeners = zkListeners.computeIfAbsent(url, k -> new ConcurrentHashMap<>());
                 ChildListener zkListener = listeners.computeIfAbsent(listener, k -> (parentPath, currentChilds) -> {
                     for (String child : currentChilds) {
