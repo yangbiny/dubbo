@@ -44,7 +44,7 @@ public class Application {
 
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
         bootstrap.application(new ApplicationConfig("dubbo-demo-api-consumer"))
-                .registry(new RegistryConfig("zookeeper://127.0.0.1:2181"))
+                .registry(new RegistryConfig("zookeeper://47.99.108.26:2181"))
                 .reference(reference)
                 .start();
 
@@ -62,7 +62,7 @@ public class Application {
     private static void runWithRefer() {
         ReferenceConfig<DemoService> reference = new ReferenceConfig<>();
         reference.setApplication(new ApplicationConfig("dubbo-demo-api-consumer"));
-        reference.setRegistry(new RegistryConfig("zookeeper://127.0.0.1:2181"));
+        reference.setRegistry(new RegistryConfig("zookeeper://47.99.108.26:2181"));
         reference.setInterface(DemoService.class);
         DemoService service = reference.get();
         String message = service.sayHello("dubbo");

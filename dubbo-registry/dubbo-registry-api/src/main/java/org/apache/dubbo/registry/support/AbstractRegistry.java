@@ -88,6 +88,7 @@ public abstract class AbstractRegistry implements Registry {
     private final AtomicInteger savePropertiesRetryTimes = new AtomicInteger();
     private final Set<URL> registered = new ConcurrentHashSet<>();
     private final ConcurrentMap<URL, Set<NotifyListener>> subscribed = new ConcurrentHashMap<>();
+    // 内存缓存的信息
     private final ConcurrentMap<URL, Map<String, List<URL>>> notified = new ConcurrentHashMap<>();
     private URL registryUrl;
     // Local disk cache file
@@ -211,6 +212,7 @@ public abstract class AbstractRegistry implements Registry {
     }
 
     private void loadProperties() {
+        // 从本地缓存中加载缓存信息
         if (file != null && file.exists()) {
             InputStream in = null;
             try {
