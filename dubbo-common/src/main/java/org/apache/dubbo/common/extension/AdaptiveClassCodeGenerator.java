@@ -71,7 +71,13 @@ public class AdaptiveClassCodeGenerator {
 
     private String defaultExtName;
 
-    public AdaptiveClassCodeGenerator(Class<?> type, String defaultExtName) {
+  /**
+   * 创建一个自适应类的代码生成器
+   *
+   * @param type 需要生成代码的类型，即接口
+   * @param defaultExtName 接口上的默认的扩展点
+   */
+  public AdaptiveClassCodeGenerator(Class<?> type, String defaultExtName) {
         this.type = type;
         this.defaultExtName = defaultExtName;
     }
@@ -124,6 +130,7 @@ public class AdaptiveClassCodeGenerator {
     }
 
     /**
+     * 会生成一个名字叫做$Adaptive的类。例如，如果接口的名称叫做ImpassiveService,则会生成一个叫做ImpassiveService$Adaptive的类
      * generate class declaration
      */
     private String generateClassDeclaration() {
@@ -214,6 +221,7 @@ public class AdaptiveClassCodeGenerator {
                 code.append(generateUrlAssignmentIndirectly(method));
             }
 
+            // 会将一个类的驼峰命名，转换成一个以"."分割的名字
             String[] value = getMethodAdaptiveValue(adaptiveAnnotation);
 
             boolean hasInvocation = hasInvocationArgument(method);

@@ -785,11 +785,12 @@ public class ExtensionLoader<T> {
      * extract and cache default extension name if exists
      */
     private void cacheDefaultExtensionName() {
+        // 获得该街口下被标注了@SPI注解的实现类
         final SPI defaultAnnotation = type.getAnnotation(SPI.class);
         if (defaultAnnotation == null) {
             return;
         }
-
+        // 判断@SPI注解的默认实现，如果实现的个数大于1个，则抛出异常
         String value = defaultAnnotation.value();
         if ((value = value.trim()).length() > 0) {
             String[] names = NAME_SEPARATOR.split(value);
@@ -797,6 +798,7 @@ public class ExtensionLoader<T> {
                 throw new IllegalStateException("More than 1 default extension name on extension " + type.getName()
                         + ": " + Arrays.toString(names));
             }
+            // 如果只有一个，则保存默认的实现类
             if (names.length == 1) {
                 cachedDefaultName = names[0];
             }
