@@ -89,6 +89,7 @@ public class ExtensionLoader<T> {
 
     private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>(64);
 
+    // 在获取一个ExtensionLoader的时候，会设置该字段的值，该字段的值即为 ExtensionLoader.getExtensionLoader(SpiService.class) 中的SpiService.class的值
     private final Class<?> type;
 
     private final ExtensionFactory objectFactory;
@@ -118,7 +119,7 @@ public class ExtensionLoader<T> {
 
     /**
      * Load all {@link Prioritized prioritized} {@link LoadingStrategy Loading Strategies} via {@link ServiceLoader}
-     *
+     * 使用Java的SPI去加载需要加载的Dubbo的配置目录路径
      * @return non-null
      * @since 2.7.7
      */
@@ -406,7 +407,7 @@ public class ExtensionLoader<T> {
 
     /**
      * Find the extension with the given name. If the specified name is not found, then {@link IllegalStateException}
-     * will be thrown.
+     * will be thrown. 获取普通的扩展类
      */
     @SuppressWarnings("unchecked")
     public T getExtension(String name) {
@@ -417,15 +418,21 @@ public class ExtensionLoader<T> {
         if (StringUtils.isEmpty(name)) {
             throw new IllegalArgumentException("Extension name == null");
         }
+        // 如果传入的参数是true,则加载并饭会默认扩展类
         if ("true".equals(name)) {
             return getDefaultExtension();
         }
+        // 先去获取一个Holder（持有该扩展点的缓存的实例），如果没有，则创建一个Holder
         final Holder<Object> holder = getOrCreateHolder(name);
         Object instance = holder.get();
+        // 如果Holder中不存在实例，则创建一个实例
         if (instance == null) {
+            // 加锁去实例化该对象
             synchronized (holder) {
+                // 多线程下，如果被其他线程实例化了就不管了
                 instance = holder.get();
                 if (instance == null) {
+                    // 创建扩展点实例
                     instance = createExtension(name, wrap);
                     holder.set(instance);
                 }
@@ -623,8 +630,15 @@ public class ExtensionLoader<T> {
         return new IllegalStateException(buf.toString());
     }
 
+    /**
+     * 1、先去缓存中获取缓存的扩展的Class信息，如果缓存的Class信息为空，则创建一个缓存的Class信息
+     * @param name 扩展点的名字
+     * @param wrap
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private T createExtension(String name, boolean wrap) {
+        // 1、获取并创建一个缓存的Class信息
         Class<?> clazz = getExtensionClasses().get(name);
         if (clazz == null) {
             throw findException(name);
@@ -772,7 +786,7 @@ public class ExtensionLoader<T> {
         cacheDefaultExtensionName();
 
         Map<String, Class<?>> extensionClasses = new HashMap<>();
-
+        // strategies的来源是通过使用Java的SPI，加载的Dubbo的配置路径
         for (LoadingStrategy strategy : strategies) {
             loadDirectory(extensionClasses, strategy.directory(), type.getName(), strategy.preferExtensionClassLoader(), strategy.overridden(), strategy.excludedPackages());
             loadDirectory(extensionClasses, strategy.directory(), type.getName().replace("org.apache", "com.alibaba"), strategy.preferExtensionClassLoader(), strategy.overridden(), strategy.excludedPackages());
@@ -785,15 +799,17 @@ public class ExtensionLoader<T> {
      * extract and cache default extension name if exists
      */
     private void cacheDefaultExtensionName() {
-        // 获得该街口下被标注了@SPI注解的实现类
+        // 获取该接口是的SPI注解，如果没有该注解，则返回的是null
         final SPI defaultAnnotation = type.getAnnotation(SPI.class);
         if (defaultAnnotation == null) {
             return;
         }
-        // 判断@SPI注解的默认实现，如果实现的个数大于1个，则抛出异常
+        // 判断@SPI注解的value属性的值
         String value = defaultAnnotation.value();
+        // 保证他的值不为空字符串
         if ((value = value.trim()).length() > 0) {
             String[] names = NAME_SEPARATOR.split(value);
+            // 如果默认实现的个数大于1个，则抛出异常
             if (names.length > 1) {
                 throw new IllegalStateException("More than 1 default extension name on extension " + type.getName()
                         + ": " + Arrays.toString(names));
@@ -809,11 +825,22 @@ public class ExtensionLoader<T> {
         loadDirectory(extensionClasses, dir, type, false, false);
     }
 
+    /**
+     *
+     * @param extensionClasses 最终ExtensionClass保存的位置，最终会将他缓存在ExtensionLoader的Class缓存中
+     * @param dir 加载扩展点的路径
+     * @param type 接口的名称
+     * @param extensionLoaderClassLoaderFirst 是否先使用ExtensionLoader的类加载器来加载具体的扩展类
+     * @param overridden 是否允许高优先级的实例，覆盖低优先级的实例
+     * @param excludedPackages 这个目前全部都是空，看代码吧
+     */
     private void loadDirectory(Map<String, Class<?>> extensionClasses, String dir, String type,
                                boolean extensionLoaderClassLoaderFirst, boolean overridden, String... excludedPackages) {
-        String fileName = dir + type;
+      // 具体的一个扩展点的文件
+      String fileName = dir + type;
         try {
             Enumeration<java.net.URL> urls = null;
+            // 获取一个类加载器。1：先获取当前线程的应用上下文的加载器；2：如果获取失败，则获取ExtensionLoader的类加载器；3：如果获取失败，则获取系统类加载器
             ClassLoader classLoader = findClassLoader();
 
             // try to load from ExtensionLoader's ClassLoader first

@@ -32,7 +32,7 @@ public interface LoadingStrategy extends Prioritized {
 
     /**
      * Indicates current {@link LoadingStrategy} supports overriding other lower prioritized instances or not.
-     *
+     *  表名当前的一个加载策略，是否允许高优先级的覆盖低优先级的实例
      * @return if supports, return <code>true</code>, or <code>false</code>
      * @since 2.7.7
      */
