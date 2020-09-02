@@ -861,6 +861,7 @@ public class ExtensionLoader<T> {
 
             if (urls != null) {
                 while (urls.hasMoreElements()) {
+                    // 最终读取到的值是类似于file:/类路径名
                     java.net.URL resourceURL = urls.nextElement();
                     loadResource(extensionClasses, classLoader, resourceURL, overridden, excludedPackages);
                 }
@@ -871,6 +872,7 @@ public class ExtensionLoader<T> {
         }
     }
 
+    // 将
     private void loadResource(Map<String, Class<?>> extensionClasses, ClassLoader classLoader,
                               java.net.URL resourceURL, boolean overridden, String... excludedPackages) {
         try {
@@ -929,9 +931,11 @@ public class ExtensionLoader<T> {
         } else if (isWrapperClass(clazz)) {
             cacheWrapperClass(clazz);
         } else {
+            // 获得一个公共构造器，如果没有则抛出异常
             clazz.getConstructor();
             if (StringUtils.isEmpty(name)) {
                 name = findAnnotationName(clazz);
+                // 主要是判断标注了@Extension注解的实现类
                 if (name.length() == 0) {
                     throw new IllegalStateException("No such extension name for the class " + clazz.getName() + " in the config " + resourceURL);
                 }
@@ -941,6 +945,7 @@ public class ExtensionLoader<T> {
             if (ArrayUtils.isNotEmpty(names)) {
                 cacheActivateClass(clazz, names[0]);
                 for (String n : names) {
+                    // 保存扩展点的类的名称
                     cacheName(clazz, n);
                     saveInExtensionClass(extensionClasses, clazz, n, overridden);
                 }
@@ -1021,9 +1026,11 @@ public class ExtensionLoader<T> {
      */
     private boolean isWrapperClass(Class<?> clazz) {
         try {
+            // 如果拿到了type类型参数的构造器，则说明是wrapper类
             clazz.getConstructor(type);
             return true;
         } catch (NoSuchMethodException e) {
+            // 抛出异常，则说明没有该类型的构造器，说明不是包装类
             return false;
         }
     }
