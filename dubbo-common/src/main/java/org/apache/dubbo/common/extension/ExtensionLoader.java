@@ -631,14 +631,18 @@ public class ExtensionLoader<T> {
     }
 
     /**
-     * 1、先去缓存中获取缓存的扩展的Class信息，如果缓存的Class信息为空，则创建一个缓存的Class信息
+     * 1、先去缓存中获取缓存的扩展的Class信息，如果缓存的Class信息为空，则创建一个缓存的Class信息。如果创建后依旧无法找到，则抛出异常
+     * 2、从实例缓存中获取一个实例，如果获取不到，则重新创建一个实例
+     * 3、如果是实例是一个包装类，则使用set方法注入包装类中的扩展点
+     * 4、如果需要包装类，则去判断是否是包装类，是的话，实例被替换为包装类
+     * 5、如果对象有继承Dubbo的Lifecycle，则执行Lifecycle下的init方法。
      * @param name 扩展点的名字
-     * @param wrap
-     * @return
+     * @param wrap 是否需要包装类
+     * @return 创建的扩展点的实例
      */
     @SuppressWarnings("unchecked")
     private T createExtension(String name, boolean wrap) {
-        // 1、获取并创建一个缓存的Class信息
+        // 1、获取并创建一个缓存的Class信息。如果最后实例化之后依旧未找到，则会抛出异常
         Class<?> clazz = getExtensionClasses().get(name);
         if (clazz == null) {
             throw findException(name);
@@ -649,11 +653,11 @@ public class ExtensionLoader<T> {
                 EXTENSION_INSTANCES.putIfAbsent(clazz, clazz.newInstance());
                 instance = (T) EXTENSION_INSTANCES.get(clazz);
             }
+            // 如果一个扩展点内有一个属性也是扩展点，那么就通过set方法进行注入
             injectExtension(instance);
 
-
+            // 判断是否是包装类，如果是是的，则初始化包装类，并注入实例
             if (wrap) {
-
                 List<Class<?>> wrapperClassesList = new ArrayList<>();
                 if (cachedWrapperClasses != null) {
                     wrapperClassesList.addAll(cachedWrapperClasses);
@@ -707,6 +711,7 @@ public class ExtensionLoader<T> {
                 }
 
                 try {
+                    // 获得set方法的方法名称，除去了set三个字，并将第一个字幕转换为小写
                     String property = getSetterProperty(method);
                     Object object = objectFactory.getExtension(pt, property);
                     if (object != null) {
@@ -872,7 +877,14 @@ public class ExtensionLoader<T> {
         }
     }
 
-    // 将
+    /** 读取配置文件里面的值，然后将每一行解析出来，并加载到缓存中。如果该类没有公共的构造函数，则会抛出异常。然后会判断是否是包装类，是的话则会添加到包装类的缓存中。也会判断是否是
+     *
+     * @param extensionClasses 扩展类的一个Holder
+     * @param classLoader 类加载器，用来加载配置文件中的实现类
+     * @param resourceURL 需要加载的类的数据信息
+     * @param overridden 是否重写
+     * @param excludedPackages 如果扩展类的包是在excludePackages下，则不会进行加载
+     */
     private void loadResource(Map<String, Class<?>> extensionClasses, ClassLoader classLoader,
                               java.net.URL resourceURL, boolean overridden, String... excludedPackages) {
         try {
