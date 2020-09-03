@@ -394,23 +394,24 @@ public class ExtensionLoader<T> {
         return cachedAdaptiveInstance.get();
     }
 
-//    public T getPrioritizedExtensionInstance() {
-//        Set<String> supported = getSupportedExtensions();
-//
-//        Set<T> instances = new HashSet<>();
-//        Set<T> prioritized = new HashSet<>();
-//        for (String s : supported) {
-//
-//        }
-//
-//    }
+  //    public T getPrioritizedExtensionInstance() {
+  //        Set<String> supported = getSupportedExtensions();
+  //
+  //        Set<T> instances = new HashSet<>();
+  //        Set<T> prioritized = new HashSet<>();
+  //        for (String s : supported) {
+  //
+  //        }
+  //
+  //    }
 
-    /**
-     * Find the extension with the given name. If the specified name is not found, then {@link IllegalStateException}
-     * will be thrown. 获取普通的扩展类
-     */
-    @SuppressWarnings("unchecked")
-    public T getExtension(String name) {
+  /**
+   * Find the extension with the given name. If the specified name is not found, then {@link
+   * IllegalStateException} will be thrown.
+   * 获取普通的扩展类。如果没有则回去创建一个扩展类。创建的时候，会缓存扩展类Class、扩展类实例、WrapperClass等信息。如果创建失败则会抛出异常。如果扩展类的名字为true，则会加载一个默认扩展类
+   */
+  @SuppressWarnings("unchecked")
+  public T getExtension(String name) {
         return getExtension(name, true);
     }
 
