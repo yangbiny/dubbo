@@ -82,30 +82,42 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
         RootBeanDefinition beanDefinition = new RootBeanDefinition();
         beanDefinition.setBeanClass(beanClass);
         beanDefinition.setLazyInit(false);
+        // 会先获取id的值，然后去替换里面的${}占位符
         String id = resolveAttribute(element, "id", parserContext);
+        // 检查ID的值，并且判断是否为空，如果为空的话，则生成一个Id的值
         if (StringUtils.isEmpty(id) && required) {
+            // 获取name标签的值
             String generatedBeanName = resolveAttribute(element, "name", parserContext);
+            // 如果name也为空
             if (StringUtils.isEmpty(generatedBeanName)) {
+                // 判断该类型是否是ProtocolConfig的配置类，是的话，就用dubbo做为名字
                 if (ProtocolConfig.class.equals(beanClass)) {
                     generatedBeanName = "dubbo";
                 } else {
+                    // 否则去拿取interface的字段的值，作为名字
                     generatedBeanName = resolveAttribute(element, "interface", parserContext);
                 }
             }
+            // 如果此时名称还是为空，则使用当前配置的类名作为名称
             if (StringUtils.isEmpty(generatedBeanName)) {
                 generatedBeanName = beanClass.getName();
             }
             id = generatedBeanName;
             int counter = 2;
+            // 判断当前的容器中是否存在该ID的bean，存在的话，则用counter逐渐累加
             while (parserContext.getRegistry().containsBeanDefinition(id)) {
                 id = generatedBeanName + (counter++);
             }
         }
+        // 如果ID不为空，则判断容器中是否存在该ID的bean，存在则抛出异常
         if (StringUtils.isNotEmpty(id)) {
+            // 判断当前容器中，是否存在有相同Id的Bean
             if (parserContext.getRegistry().containsBeanDefinition(id)) {
                 throw new IllegalStateException("Duplicate spring bean id " + id);
             }
+            // 注册该Bean的元数据信息
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
+            // 设置当前BeanDefinition的ID
             beanDefinition.getPropertyValues().addPropertyValue("id", id);
         }
         if (ProtocolConfig.class.equals(beanClass)) {
