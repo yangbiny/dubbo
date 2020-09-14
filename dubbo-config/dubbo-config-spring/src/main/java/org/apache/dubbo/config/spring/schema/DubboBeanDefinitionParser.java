@@ -133,30 +133,37 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
             }
         } else if (ServiceBean.class.equals(beanClass)) {
             String className = resolveAttribute(element, "class", parserContext);
+            // 获得Class的值，如果Class的值不为空，则说明该对象是配置的服务对象，则注册为当前Bean
             if (StringUtils.isNotEmpty(className)) {
                 RootBeanDefinition classDefinition = new RootBeanDefinition();
                 classDefinition.setBeanClass(ReflectUtils.forName(className));
                 classDefinition.setLazyInit(false);
                 parseProperties(element.getChildNodes(), classDefinition, parserContext);
+                // 设置ref的值为class对应的类的BeanDefinition
                 beanDefinition.getPropertyValues().addPropertyValue("ref", new BeanDefinitionHolder(classDefinition, id + "Impl"));
             }
         } else if (ProviderConfig.class.equals(beanClass)) {
+            // 会去判断里面是否有service这个标签，有的话，则加入到配置中
             parseNested(element, parserContext, ServiceBean.class, true, "service", "provider", id, beanDefinition);
         } else if (ConsumerConfig.class.equals(beanClass)) {
             parseNested(element, parserContext, ReferenceBean.class, false, "reference", "consumer", id, beanDefinition);
         }
+        // 保存的是方法名称
         Set<String> props = new HashSet<>();
         ManagedMap parameters = null;
         for (Method setter : beanClass.getMethods()) {
             String name = setter.getName();
+            // 获取所有的setter方法
             if (name.length() > 3 && name.startsWith("set")
                     && Modifier.isPublic(setter.getModifiers())
                     && setter.getParameterTypes().length == 1) {
                 Class<?> type = setter.getParameterTypes()[0];
                 String beanProperty = name.substring(3, 4).toLowerCase() + name.substring(4);
+                // 因为在xml中。驼峰式的方法命名是以"-"分隔开的
                 String property = StringUtils.camelToSplitName(beanProperty, "-");
                 props.add(property);
                 // check the setter/getter whether match
+                // 判断是否存在getter方法，没有的话，则继续下一个
                 Method getter = null;
                 try {
                     getter = beanClass.getMethod("get" + name.substring(3), new Class<?>[0]);
@@ -173,6 +180,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                         || !type.equals(getter.getReturnType())) {
                     continue;
                 }
+                // 判断方法的名称，如果方法的名称是parameters，则会去解析xml配置文件中的<dubbo:parameters>标签，并获得key和value
                 if ("parameters".equals(property)) {
                     parameters = parseParameters(element.getChildNodes(), beanDefinition, parserContext);
                 } else if ("methods".equals(property)) {

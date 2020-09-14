@@ -21,15 +21,23 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
-    <dubbo:application metadata-type="remote" name="demo-provider"/>
+    <dubbo:application metadata-type="remote" name="demo-provider">
+        <dubbo:parameter key="x" value="x"/>
+    </dubbo:application>
     <dubbo:metadata-report address="zookeeper://47.99.108.26:2181"/>
 
     <dubbo:registry address="zookeeper://47.99.108.26:2181"/>
 
     <dubbo:protocol name="dubbo"/>
 
-    <bean id="demoService" class="org.apache.dubbo.demo.provider.DemoServiceImpl"/>
+    <bean id="demoService" class="org.apache.dubbo.demo.provider.DemoServiceImpl">
+        <dubbo:method name="sayHello"/>
+    </bean>
 
-    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService"/>
+    <dubbo:service interface="org.apache.dubbo.demo.DemoService" ref="demoService" class="org.apache.dubbo.demo.provider.DemoServiceImpl"/>
 
+    <dubbo:provider>
+        <dubbo:parameter key="xx" value="xx"/>
+        <dubbo:service interface="org.apache.dubbo.demo.provider.DemoServiceImpl"/>
+    </dubbo:provider>
 </beans>
