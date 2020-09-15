@@ -187,8 +187,10 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                     // 解析methods得元素信息，并放入到beanDefinition中
                     parseMethods(id, element.getChildNodes(), beanDefinition, parserContext);
                 } else if ("arguments".equals(property)) {
+                    // 与method类似，也是会放入到beanDefinition
                     parseArguments(id, element.getChildNodes(), beanDefinition, parserContext);
                 } else {
+                    // 都未匹配的情况下，直接去解析property
                     String value = resolveAttribute(element, property, parserContext);
                     if (value != null) {
                         value = value.trim();
@@ -240,6 +242,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                 }
             }
         }
+        // 封装paramete注解
         NamedNodeMap attributes = element.getAttributes();
         int len = attributes.getLength();
         for (int i = 0; i < len; i++) {
