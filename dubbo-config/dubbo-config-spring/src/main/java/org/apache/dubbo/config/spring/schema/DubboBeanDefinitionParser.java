@@ -184,6 +184,7 @@ public class DubboBeanDefinitionParser implements BeanDefinitionParser {
                 if ("parameters".equals(property)) {
                     parameters = parseParameters(element.getChildNodes(), beanDefinition, parserContext);
                 } else if ("methods".equals(property)) {
+                    // 解析methods得元素信息，并放入到beanDefinition中
                     parseMethods(id, element.getChildNodes(), beanDefinition, parserContext);
                 } else if ("arguments".equals(property)) {
                     parseArguments(id, element.getChildNodes(), beanDefinition, parserContext);
