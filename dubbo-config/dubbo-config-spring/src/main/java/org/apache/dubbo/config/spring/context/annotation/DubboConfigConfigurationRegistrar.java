@@ -52,6 +52,7 @@ public class DubboConfigConfigurationRegistrar implements ImportBeanDefinitionRe
             registerBeans(registry, DubboConfigConfiguration.Multiple.class);
         }
 
+        // 将一些配置相关的Bean都注册到Spring容器中
         // Since 2.7.6
         registerCommonBeans(registry);
     }
