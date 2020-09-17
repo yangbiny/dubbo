@@ -118,6 +118,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         this(new LinkedHashSet<>(packagesToScan));
     }
 
+    // 值的来源是 org.apache.dubbo.config.spring.context.annotation.DubboComponentScanRegistrar.registerServiceAnnotationBeanPostProcessor
     public ServiceClassPostProcessor(Set<String> packagesToScan) {
         this.packagesToScan = packagesToScan;
     }
@@ -128,9 +129,11 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         // @since 2.7.5
         registerInfrastructureBean(registry, DubboBootstrapApplicationListener.BEAN_NAME, DubboBootstrapApplicationListener.class);
 
+        // 解析需要扫描的包的路径。替换里面可能存在的占位符等
         Set<String> resolvedPackagesToScan = resolvePackagesToScan(packagesToScan);
 
         if (!CollectionUtils.isEmpty(resolvedPackagesToScan)) {
+            // 扫描包信息
             registerServiceBeans(resolvedPackagesToScan, registry);
         } else {
             if (logger.isWarnEnabled()) {
@@ -156,6 +159,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         scanner.setBeanNameGenerator(beanNameGenerator);
 
         // refactor @since 2.7.7
+        // 指定去扫描 serviceAnnotationTypes 下的注解类型
         serviceAnnotationTypes.forEach(annotationType -> {
             scanner.addIncludeFilter(new AnnotationTypeFilter(annotationType));
         });
@@ -163,9 +167,12 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         for (String packageToScan : packagesToScan) {
 
             // Registers @Service Bean first
+            // 会去扫描包，找出包下的每一个资源，然后加载他的Metadata信息，并判断是否是标有serviceAnnotationTypes中的注解
+            // 并注入到容器中
             scanner.scan(packageToScan);
 
             // Finds all BeanDefinitionHolders of @Service whether @ComponentScan scans or not.
+            // 生成一个BeanDefinitionHolder
             Set<BeanDefinitionHolder> beanDefinitionHolders =
                     findServiceBeanDefinitionHolders(scanner, packageToScan, registry, beanNameGenerator);
 
@@ -278,6 +285,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
 
         Class<?> beanClass = resolveClass(beanDefinitionHolder);
 
+        // 找出beanClass 头部注释中的在serviceAnnotationTypes中的第一个信息
         Annotation service = findServiceAnnotation(beanClass);
 
         /**
@@ -285,6 +293,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
          */
         AnnotationAttributes serviceAnnotationAttributes = getAnnotationAttributes(service, false, false);
 
+        // 获取interfaceClass的值或者是beanClass（标记了Service注解的类）继承的第一个接口
         Class<?> interfaceClass = resolveServiceInterfaceClass(serviceAnnotationAttributes, beanClass);
 
         String annotatedServiceBeanName = beanDefinitionHolder.getBeanName();
@@ -296,6 +305,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
         String beanName = generateServiceBeanName(serviceAnnotationAttributes, interfaceClass);
 
         if (scanner.checkCandidate(beanName, serviceBeanDefinition)) { // check duplicated candidate bean
+            // 注册Bean的信息
             registry.registerBeanDefinition(beanName, serviceBeanDefinition);
 
             if (logger.isInfoEnabled()) {
@@ -323,6 +333,7 @@ public class ServiceClassPostProcessor implements BeanDefinitionRegistryPostProc
      * @since 2.7.3
      */
     private Annotation findServiceAnnotation(Class<?> beanClass) {
+        // 将beanClass的头部注释信息，根据serviceAnnotationTypes的先后顺序进行排序，会返回第一个注释的信息，将后面注释的信息结合在第一个注释的信息上返回
         return serviceAnnotationTypes
                 .stream()
                 .map(annotationType -> findMergedAnnotation(beanClass, annotationType))
