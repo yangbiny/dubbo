@@ -348,6 +348,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         map.put(SIDE_KEY, PROVIDER_SIDE);
 
         ServiceConfig.appendRuntimeParameters(map);
+        // 会去遍历给定对象中的所有的方法，拿出对象中值不为空的所有的属性，以key、value的形式存放在map中。如果已经存在了，就以逗号分隔
         AbstractConfig.appendParameters(map, getMetrics());
         AbstractConfig.appendParameters(map, getApplication());
         AbstractConfig.appendParameters(map, getModule());
@@ -360,6 +361,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         if (metadataReportConfig != null && metadataReportConfig.isValid()) {
             map.putIfAbsent(METADATA_KEY, REMOTE_METADATA_STORAGE_TYPE);
         }
+        // 获取配置了方法级别的配置的方法信息
         if (CollectionUtils.isNotEmpty(getMethods())) {
             for (MethodConfig method : getMethods()) {
                 AbstractConfig.appendParameters(map, method, method.getName());
@@ -375,6 +377,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                     for (ArgumentConfig argument : arguments) {
                         // convert argument type
                         if (argument.getType() != null && argument.getType().length() > 0) {
+                            // 获取当前类的所有方法
                             Method[] methods = interfaceClass.getMethods();
                             // visit all methods
                             if (methods.length > 0) {
@@ -424,7 +427,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             if (revision != null && revision.length() > 0) {
                 map.put(REVISION_KEY, revision);
             }
-
+            // 会将接口中的方法名称全部拿出来
             String[] methods = Wrapper.getWrapper(interfaceClass).getMethodNames();
             if (methods.length == 0) {
                 logger.warn("No method found in service interface " + interfaceClass.getName());

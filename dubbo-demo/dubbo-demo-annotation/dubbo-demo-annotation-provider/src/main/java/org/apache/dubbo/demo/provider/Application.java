@@ -16,9 +16,13 @@
  */
 package org.apache.dubbo.demo.provider;
 
+import com.google.common.collect.Lists;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.dubbo.config.ApplicationConfig;
+import org.apache.dubbo.config.ArgumentConfig;
+import org.apache.dubbo.config.MethodConfig;
 import org.apache.dubbo.config.ProtocolConfig;
 import org.apache.dubbo.config.ProviderConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -80,6 +84,12 @@ public class Application {
       demoServiceServiceConfig.setInterface(DemoService.class);
       demoServiceServiceConfig.setVersion("123");
       demoServiceServiceConfig.setGroup("xx");
+      MethodConfig methodConfig = new MethodConfig();
+      methodConfig.setName("sayHello");
+      ArgumentConfig argumentConfig = new ArgumentConfig();
+      argumentConfig.setIndex(1);
+      methodConfig.setArguments(Lists.newArrayList(argumentConfig));
+      demoServiceServiceConfig.setMethods(Lists.newArrayList(methodConfig));
       return demoServiceServiceConfig;
     }
 
