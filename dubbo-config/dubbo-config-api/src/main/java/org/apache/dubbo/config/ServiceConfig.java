@@ -181,10 +181,12 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
     }
 
     public synchronized void export() {
+        // 默认是需要暴露服务的，如果不想暴露服务，可以在ProviderConfig(需要注入到ServiceConfig中)或者ServiceConfig中配置export为false。
         if (!shouldExport()) {
             return;
         }
 
+        // 是一个单例，使用的懒汉式
         if (bootstrap == null) {
             bootstrap = DubboBootstrap.getInstance();
             bootstrap.initialize();
@@ -193,9 +195,13 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         checkAndUpdateSubConfigs();
 
         //init serviceMetadata
+        // 会优先使用Serviceconfig的version,如果ServiceConfig的version为空，ProviderConfig的version不为空，则使用Provider的version，否则使用ServiceConfig
         serviceMetadata.setVersion(getVersion());
+        // 同version
         serviceMetadata.setGroup(getGroup());
+        // 同上
         serviceMetadata.setDefaultGroup(getGroup());
+        // 获取服务的接口名称
         serviceMetadata.setServiceType(getInterfaceClass());
         serviceMetadata.setServiceInterfaceName(getInterface());
         serviceMetadata.setTarget(getRef());
@@ -302,16 +308,18 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void doExportUrls() {
+        // 通过SPI机制，获取到的是org.apache.dubbo.rpc.model.ServiceRepository的实例
         ServiceRepository repository = ApplicationModel.getServiceRepository();
         ServiceDescriptor serviceDescriptor = repository.registerService(getInterfaceClass());
         repository.registerProvider(
+                // 由group/interfaceName:version组成
                 getUniqueServiceName(),
                 ref,
                 serviceDescriptor,
                 this,
                 serviceMetadata
         );
-
+        // 生成注册中心的URL信息
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
         for (ProtocolConfig protocolConfig : protocols) {
@@ -437,6 +445,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
             }
         }
         //init serviceMetadata attachments
+        // TODO 会将参数信息传递到远端的注册中心?
         serviceMetadata.getAttachments().putAll(map);
 
         // export service
@@ -453,8 +462,9 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
         String scope = url.getParameter(SCOPE_KEY);
         // don't export when none is configured
+        // 当Protocol配置了parameters，并设置了参数scope为none的时候，就不会进行export
         if (!SCOPE_NONE.equalsIgnoreCase(scope)) {
-
+            // 只有当配置了Protocol的parameters参数，并设置了scope的值为remote的时候，就不会暴露到本地
             // export to local if the config is not remote (export to remote only when config is remote)
             if (!SCOPE_REMOTE.equalsIgnoreCase(scope)) {
                 exportLocal(url);
@@ -486,10 +496,12 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                             registryURL = registryURL.addParameter(PROXY_KEY, proxy);
                         }
 
+                        // 会使用一个工厂来创建一个invoker。Invoker会使用创建的代理对象来执行最终的方法
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
                         Exporter<?> exporter = PROTOCOL.export(wrapperInvoker);
+                        // 将暴露出去的export放入到exporters中
                         exporters.add(exporter);
                     }
                 } else {

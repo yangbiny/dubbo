@@ -33,6 +33,9 @@ import java.util.concurrent.ConcurrentMap;
 import static org.apache.dubbo.common.BaseServiceMetadata.interfaceFromServiceKey;
 import static org.apache.dubbo.common.BaseServiceMetadata.versionFromServiceKey;
 
+/**
+ * 通过下面的属性 services、consumers、providers、prividersWithoutGroup分别保存了服务信息、服务提供者的信息、消费者的信息
+ */
 public class ServiceRepository extends LifecycleAdapter implements FrameworkExt {
 
     public static final String NAME = "repository";
@@ -119,6 +122,7 @@ public class ServiceRepository extends LifecycleAdapter implements FrameworkExt 
         ProviderModel providerModel = new ProviderModel(serviceKey, serviceInstance, serviceModel, serviceConfig,
                 serviceMetadata);
         providers.putIfAbsent(serviceKey, providerModel);
+        // key去掉了group，由interfaceName:version组成
         providersWithoutGroup.putIfAbsent(keyWithoutGroup(serviceKey), providerModel);
     }
 

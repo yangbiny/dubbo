@@ -16,31 +16,83 @@
  */
 package org.apache.dubbo.demo.provider;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.dubbo.config.ApplicationConfig;
+import org.apache.dubbo.config.ProtocolConfig;
+import org.apache.dubbo.config.ProviderConfig;
 import org.apache.dubbo.config.RegistryConfig;
+import org.apache.dubbo.config.ServiceConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 
+import org.apache.dubbo.demo.DemoService;
+import org.apache.dubbo.rpc.Protocol;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 public class Application {
-    public static void main(String[] args) throws Exception {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ProviderConfiguration.class);
-        context.start();
-        System.in.read();
+  public static void main(String[] args) throws Exception {
+    AnnotationConfigApplicationContext context =
+        new AnnotationConfigApplicationContext(ProviderConfiguration.class);
+    context.start();
+    System.in.read();
+  }
+
+  @Configuration
+  @EnableDubbo(scanBasePackages = "org.apache.dubbo.demo.provider")
+  @PropertySource("classpath:/spring/dubbo-provider.properties")
+  static class ProviderConfiguration {
+
+    @Bean
+    public DemoService demoService() {
+      return new DemoServiceImpl();
     }
 
-    @Configuration
-    @EnableDubbo(scanBasePackages = "org.apache.dubbo.demo.provider")
-    @PropertySource("classpath:/spring/dubbo-provider.properties")
-    static class ProviderConfiguration {
-        @Bean
-        public RegistryConfig registryConfig() {
-            RegistryConfig registryConfig = new RegistryConfig();
-            registryConfig.setId("r1");
-            registryConfig.setAddress("zookeeper://47.99.108.26:2181");
-            return registryConfig;
-        }
+    @Bean
+    public ApplicationConfig applicationConfig() {
+      ApplicationConfig applicationConfig = new ApplicationConfig();
+      applicationConfig.setName("test");
+      return applicationConfig;
     }
+
+    @Bean
+    public RegistryConfig registryConfig() {
+      RegistryConfig registryConfig = new RegistryConfig();
+      registryConfig.setId("r1");
+      registryConfig.setAddress("zookeeper://47.99.108.26:2181");
+      return registryConfig;
+    }
+
+    @Bean
+    public ProviderConfig providerConfig() {
+      ProviderConfig providerConfig = new ProviderConfig();
+      providerConfig.setExport(true);
+      return providerConfig;
+    }
+
+    @Bean
+    public ServiceConfig<DemoService> demoServiceServiceConfig(DemoService demoService) {
+      ServiceConfig<DemoService> demoServiceServiceConfig = new ServiceConfig<>();
+      demoServiceServiceConfig.setProvider(providerConfig());
+      demoServiceServiceConfig.setRef(demoService);
+      demoServiceServiceConfig.setInterface(DemoService.class);
+      demoServiceServiceConfig.setVersion("123");
+      demoServiceServiceConfig.setGroup("xx");
+      return demoServiceServiceConfig;
+    }
+
+    @Bean
+    public ProtocolConfig protocolConfig() {
+      ProtocolConfig protocolConfig = new ProtocolConfig();
+      protocolConfig.setDefault(true);
+      protocolConfig.setPort(2233);
+      protocolConfig.setName("dubbo");
+      Map<String,String> param = new HashMap<>(2);
+      param.put("scope","remote");
+      protocolConfig.setParameters(param);
+      return protocolConfig;
+    }
+  }
 }
