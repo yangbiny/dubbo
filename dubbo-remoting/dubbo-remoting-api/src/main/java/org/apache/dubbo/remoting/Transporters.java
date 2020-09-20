@@ -53,6 +53,7 @@ public class Transporters {
         } else {
             handler = new ChannelHandlerDispatcher(handlers);
         }
+        // 先去获取一个网络传输层的默认扩展点。然后会启动netty，监听端口
         return getTransporter().bind(url, handler);
     }
 

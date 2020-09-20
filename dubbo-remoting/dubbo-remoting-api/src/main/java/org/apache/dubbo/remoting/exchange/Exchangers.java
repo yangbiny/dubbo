@@ -67,6 +67,7 @@ public class Exchangers {
             throw new IllegalArgumentException("handler == null");
         }
         url = url.addParameterIfAbsent(Constants.CODEC_KEY, "exchange");
+        // 属于Exchange层,建立Request-Response模型，封装请求响应
         return getExchanger(url).bind(url, handler);
     }
 
