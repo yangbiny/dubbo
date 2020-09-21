@@ -59,6 +59,7 @@ public class ProtocolListenerWrapper implements Protocol {
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
         if (UrlUtils.isRegistry(invoker.getUrl())) {
+            // 这里的protocol是属于RegistryProtocol
             return protocol.export(invoker);
         }
         return new ListenerExporterWrapper<T>(protocol.export(invoker),

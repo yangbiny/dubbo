@@ -150,6 +150,7 @@ public class ProtocolFilterWrapper implements Protocol {
     @Override
     public <T> Exporter<T> export(Invoker<T> invoker) throws RpcException {
         if (UrlUtils.isRegistry(invoker.getUrl())) {
+            // 这里的protocol是属于ProtocolListenerWrapper
             return protocol.export(invoker);
         }
         return protocol.export(buildInvokerChain(invoker, SERVICE_FILTER_KEY, CommonConstants.PROVIDER));
