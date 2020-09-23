@@ -191,7 +191,7 @@ public class ConfigValidationUtils {
                     List<URL> urls = UrlUtils.parseURLs(address, map);
 
                     for (URL url : urls) {
-
+                        // 此处添加的key为registry参数的值，会作用为暴露服务的时候，选择具体的协议，写入到对应的服务中
                         url = URLBuilder.from(url)
                                 .addParameter(REGISTRY_KEY, url.getProtocol())
                                 .setProtocol(extractRegistryType(url))

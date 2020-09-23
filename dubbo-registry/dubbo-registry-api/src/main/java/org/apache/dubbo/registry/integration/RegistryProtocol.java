@@ -188,14 +188,16 @@ public class RegistryProtocol implements Protocol {
 
     @Override
     public <T> Exporter<T> export(final Invoker<T> originInvoker) throws RpcException {
+        // 会去获得URL中的registry的参数，并设置当前URL的protocol为该参数的值，如果参数不存在，则直接返回。替换为对应的注册协议，例如zookeeper
         URL registryUrl = getRegistryUrl(originInvoker);
-        // url to export locally
+        // url to export locally，会去获取URL中的export参数的值，如果为空，则会抛出异常，否则会创建一个新的URL
         URL providerUrl = getProviderUrl(originInvoker);
 
         // Subscribe the override data
         // FIXME When the provider subscribes, it will affect the scene : a certain JVM exposes the service and call
         //  the same service. Because the subscribed is cached key with the name of the service, it causes the
         //  subscription information to cover.
+        // TODO 对于控制台的服务重写。先留着，后面继续
         final URL overrideSubscribeUrl = getSubscribedOverrideUrl(providerUrl);
         final OverrideListener overrideSubscribeListener = new OverrideListener(overrideSubscribeUrl, originInvoker);
         overrideListeners.put(overrideSubscribeUrl, overrideSubscribeListener);
@@ -217,6 +219,7 @@ public class RegistryProtocol implements Protocol {
         }
 
         // register stated url on provider model
+        // 会写入到ServiceRepository中的providers中，记录服务提供者的URL的信息以及暴露的状态
         registerStatedUrl(registryUrl, registeredProviderUrl, register);
 
 
@@ -226,6 +229,7 @@ public class RegistryProtocol implements Protocol {
         // Deprecated! Subscribe to override rules in 2.6.x or before.
         registry.subscribe(overrideSubscribeUrl, overrideSubscribeListener);
 
+        // 用户可自定义的监听器
         notifyExport(exporter);
         //Ensure that a new exporter instance is returned every time export
         return new DestroyableExporter<>(exporter);

@@ -105,6 +105,7 @@ public class DubboProtocol extends AbstractProtocol {
     private final ConcurrentMap<String, Object> locks = new ConcurrentHashMap<>();
     private final Set<String> optimizers = new ConcurrentHashSet<>();
 
+    // 会被Exchange层包起来，并传入到netty服务器中
     private ExchangeHandler requestHandler = new ExchangeHandlerAdapter() {
 
         @Override
@@ -312,10 +313,12 @@ public class DubboProtocol extends AbstractProtocol {
         //client can export a service which's only for server to invoke
         boolean isServer = url.getParameter(IS_SERVER_KEY, true);
         if (isServer) {
+            // 根据Address去获取一个server
             ProtocolServer server = serverMap.get(key);
             if (server == null) {
                 synchronized (this) {
                     server = serverMap.get(key);
+                    // 没有找到则创建一个servce
                     if (server == null) {
                         // 以address作为key，可以保证每一个地址只有一个netty
                         serverMap.put(key, createServer(url));
@@ -329,11 +332,13 @@ public class DubboProtocol extends AbstractProtocol {
     }
 
     private ProtocolServer createServer(URL url) {
+        // 添加一些服务器得相关参数
         url = URLBuilder.from(url)
                 // send readonly event when server closes, it's enabled by default
                 .addParameterIfAbsent(CHANNEL_READONLYEVENT_SENT_KEY, Boolean.TRUE.toString())
                 // enable heartbeat by default
                 .addParameterIfAbsent(HEARTBEAT_KEY, String.valueOf(DEFAULT_HEARTBEAT))
+                // 设置编解码器，默认是用dubbo
                 .addParameter(CODEC_KEY, DubboCodec.NAME)
                 .build();
         String str = url.getParameter(SERVER_KEY, DEFAULT_REMOTING_SERVER);

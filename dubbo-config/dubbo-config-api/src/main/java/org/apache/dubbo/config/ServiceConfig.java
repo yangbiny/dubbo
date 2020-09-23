@@ -455,7 +455,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         // TODO 会将参数信息传递到远端的注册中心?
         serviceMetadata.getAttachments().putAll(map);
 
-        // export service
+        // export service，后面暴露服务的时候，需要使用此时封装的URL
         String host = findConfigedHosts(protocolConfig, registryURLs, map);
         Integer port = findConfigedPorts(protocolConfig, name, map);
         URL url = new URL(name, host, port, getContextPath(protocolConfig).map(p -> p + "/" + path).orElse(path), map);
@@ -504,6 +504,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                         }
 
                         // 会使用一个工厂来创建一个invoker。Invoker会使用创建的代理对象来执行最终的方法
+                        // registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()) 添加的这个参数会作为真正暴露出去的URL
                         Invoker<?> invoker = PROXY_FACTORY.getInvoker(ref, (Class) interfaceClass, registryURL.addParameterAndEncoded(EXPORT_KEY, url.toFullString()));
                         DelegateProviderMetaDataInvoker wrapperInvoker = new DelegateProviderMetaDataInvoker(invoker, this);
 
