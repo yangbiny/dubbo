@@ -99,7 +99,10 @@ public class RegistryProtocolTest {
     public void testExport() {
         RegistryProtocol registryProtocol = getRegistryProtocol();
 //        registryProtocol.setCluster(new FailfastCluster());
-        registryProtocol.setRegistryFactory(ExtensionLoader.getExtensionLoader(RegistryFactory.class).getAdaptiveExtension());
+        RegistryFactory adaptiveExtension = ExtensionLoader
+            .getExtensionLoader(RegistryFactory.class).getAdaptiveExtension();
+        registryProtocol.setRegistryFactory(adaptiveExtension);
+
 
         Protocol dubboProtocol = DubboProtocol.getDubboProtocol();
         registryProtocol.setProtocol(dubboProtocol);
