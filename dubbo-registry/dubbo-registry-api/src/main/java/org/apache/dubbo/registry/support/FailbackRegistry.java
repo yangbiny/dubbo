@@ -237,11 +237,15 @@ public abstract class FailbackRegistry extends AbstractRegistry {
             logger.info("URL " + url + " will not be registered to Registry. Registry " + url + " does not accept service of this protocol type.");
             return;
         }
+        // 调用父类的方法，将URL写入已经注册的URL的缓存中
         super.register(url);
+        // 如果该URL注册失败过，则先从失败的队列中移除
         removeFailedRegistered(url);
+        // 如果是未注册的URL，则移除未注册URL的队列
         removeFailedUnregistered(url);
         try {
             // Sending a registration request to the server side
+            // 调用具体的实例，写入数据
             doRegister(url);
         } catch (Exception e) {
             Throwable t = e;

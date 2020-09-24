@@ -174,6 +174,8 @@ public class RegistryProtocol implements Protocol {
     }
 
     private void register(URL registryUrl, URL registeredProviderUrl) {
+        // registryFactory是使用自适应创建一个工厂
+        // getRegistry得时候会优先根据protocol获取一个Registry，如果没有，则使用dubbo
         Registry registry = registryFactory.getRegistry(registryUrl);
         registry.register(registeredProviderUrl);
     }
