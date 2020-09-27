@@ -82,27 +82,8 @@ public class Application {
       demoServiceServiceConfig.setProvider(providerConfig());
       demoServiceServiceConfig.setRef(demoService);
       demoServiceServiceConfig.setInterface(DemoService.class);
-      demoServiceServiceConfig.setVersion("123");
-      demoServiceServiceConfig.setGroup("xx");
-      MethodConfig methodConfig = new MethodConfig();
-      methodConfig.setName("sayHello");
-      ArgumentConfig argumentConfig = new ArgumentConfig();
-      argumentConfig.setIndex(1);
-      methodConfig.setArguments(Lists.newArrayList(argumentConfig));
-      demoServiceServiceConfig.setMethods(Lists.newArrayList(methodConfig));
       return demoServiceServiceConfig;
     }
 
-    @Bean
-    public ProtocolConfig protocolConfig() {
-      ProtocolConfig protocolConfig = new ProtocolConfig();
-      protocolConfig.setDefault(true);
-      protocolConfig.setPort(2233);
-      protocolConfig.setName("dubbo");
-      Map<String,String> param = new HashMap<>(2);
-      param.put("scope","remote");
-      protocolConfig.setParameters(param);
-      return protocolConfig;
-    }
   }
 }

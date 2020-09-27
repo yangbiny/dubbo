@@ -16,6 +16,7 @@
  */
 package org.apache.dubbo.demo.consumer.comp;
 
+import javax.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.demo.DemoService;
 
@@ -25,16 +26,15 @@ import java.util.concurrent.CompletableFuture;
 
 @Component("demoServiceComponent")
 public class DemoServiceComponent implements DemoService {
-    @DubboReference
-    private DemoService demoService;
+  @Resource private DemoService demoService;
 
-    @Override
-    public String sayHello(String name) {
-        return demoService.sayHello(name);
-    }
+  @Override
+  public String sayHello(String name) {
+    return demoService.sayHello(name);
+  }
 
-    @Override
-    public CompletableFuture<String> sayHelloAsync(String name) {
-        return null;
-    }
+  @Override
+  public CompletableFuture<String> sayHelloAsync(String name) {
+    return null;
+  }
 }
