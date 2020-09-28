@@ -69,6 +69,7 @@ public class ConfigManager extends LifecycleAdapter implements FrameworkExt {
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
+    // 在服务初始化得时候，会由Spring将数据写进
     final Map<String, Map<String, AbstractConfig>> configsCache = newMap();
 
     public ConfigManager() {

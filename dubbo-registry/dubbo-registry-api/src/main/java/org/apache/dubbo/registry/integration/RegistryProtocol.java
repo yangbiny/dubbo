@@ -458,7 +458,7 @@ public class RegistryProtocol implements Protocol {
                 return doRefer(Cluster.getCluster(MergeableCluster.NAME), registry, type, url);
             }
         }
-
+        // 集群容错层，当远程调用失败时得容错策略。默认是快速失败。可以通过
         Cluster cluster = Cluster.getCluster(qs.get(CLUSTER_KEY));
         return doRefer(cluster, registry, type, url);
     }

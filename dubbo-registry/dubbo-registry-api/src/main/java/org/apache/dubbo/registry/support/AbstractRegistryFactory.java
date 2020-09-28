@@ -85,11 +85,13 @@ public abstract class AbstractRegistryFactory implements RegistryFactory {
         try {
             for (Registry registry : getRegistries()) {
                 try {
+                    // 会去关闭注册中心得链接
                     registry.destroy();
                 } catch (Throwable e) {
                     LOGGER.error(e.getMessage(), e);
                 }
             }
+            // 清空注册中心得信息
             REGISTRIES.clear();
         } finally {
             // Release the lock

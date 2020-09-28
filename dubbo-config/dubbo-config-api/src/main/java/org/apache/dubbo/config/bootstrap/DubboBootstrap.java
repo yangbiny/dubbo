@@ -624,6 +624,7 @@ public class DubboBootstrap extends GenericEventListener {
             }
             environment.setDynamicConfiguration(compositeDynamicConfiguration);
         }
+        // 会去设置各个参数得值
         configManager.refreshAll();
     }
 

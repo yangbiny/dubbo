@@ -298,6 +298,7 @@ public class ConfigValidationUtils {
         checkName("stub", config.getStub());
         checkMultiName("owner", config.getOwner());
 
+        // 会去检测对应得扩展点是否存在
         checkExtension(ProxyFactory.class, PROXY_KEY, config.getProxy());
         checkExtension(Cluster.class, CLUSTER_KEY, config.getCluster());
         checkMultiExtension(Filter.class, FILE_KEY, config.getFilter());

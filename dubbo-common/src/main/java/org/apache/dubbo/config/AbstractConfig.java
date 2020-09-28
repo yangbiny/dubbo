@@ -465,6 +465,7 @@ public abstract class AbstractConfig implements Serializable {
         try {
             CompositeConfiguration compositeConfiguration = env.getPrefixedConfiguration(this);
             // loop methods, get override value and set the new value back to method
+            // 循环遍历方法列表，然后调用方法设置值
             Method[] methods = getClass().getMethods();
             for (Method method : methods) {
                 if (MethodUtils.isSetter(method)) {
@@ -582,6 +583,7 @@ public abstract class AbstractConfig implements Serializable {
      */
     @PostConstruct
     public void addIntoConfigManager() {
+        // 在实例化对象的时候，会将该配置信息加入到ConfigManager中。包括了各种配置信息Application、ReferenceConfig、RegistryConfig
         ApplicationModel.getConfigManager().addConfig(this);
     }
 

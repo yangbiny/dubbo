@@ -92,6 +92,7 @@ public class ApplicationModel {
         return (ConfigManager) LOADER.getExtension(ConfigManager.NAME);
     }
 
+
     public static ServiceRepository getServiceRepository() {
         return (ServiceRepository) LOADER.getExtension(ServiceRepository.NAME);
     }

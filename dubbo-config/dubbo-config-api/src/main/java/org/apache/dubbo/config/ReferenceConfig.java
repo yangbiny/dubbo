@@ -197,6 +197,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         this.services = services;
     }
 
+    @Override
     public synchronized T get() {
         if (destroyed) {
             throw new IllegalStateException("The invoker of ReferenceConfig(" + url + ") has already destroyed!");
@@ -207,6 +208,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         return ref;
     }
 
+    @Override
     public synchronized void destroy() {
         if (ref == null) {
             return;
@@ -233,6 +235,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         }
 
         if (bootstrap == null) {
+            // 饿汉式加载一个bootstrap
             bootstrap = DubboBootstrap.getInstance();
             bootstrap.init();
         }
@@ -473,6 +476,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 serviceMetadata);
 
         resolveFile();
+        // 此处会去检测参数得配置是否正确
         ConfigValidationUtils.validateReferenceConfig(this);
         postProcessConfig();
     }
