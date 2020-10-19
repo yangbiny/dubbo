@@ -240,6 +240,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             bootstrap.init();
         }
 
+        // 检查配置信息
         checkAndUpdateSubConfigs();
 
         checkStubAndLocal(interfaceClass);
@@ -314,7 +315,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
         consumerModel.init(attributes);
 
         initialized = true;
-
+        // 检查生成的invoker是否可用
         checkInvokerAvailable();
 
         // dispatch a ReferenceConfigInitializedEvent since 2.7.4
@@ -323,6 +324,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
 
     @SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
     private T createProxy(Map<String, String> map) {
+        // 是否走内部jvm调用
         if (shouldJvmRefer(map)) {
             URL url = new URL(LOCAL_PROTOCOL, LOCALHOST_VALUE, 0, interfaceClass.getName()).addParameters(map);
             invoker = REF_PROTOCOL.refer(interfaceClass, url);
@@ -331,6 +333,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
             }
         } else {
             urls.clear();
+            // 如果用户有指定url，则进行点对点的调用
             if (url != null && url.length() > 0) { // user specified URL, could be peer-to-peer address, or register center's address.
                 String[] us = SEMICOLON_SPLIT_PATTERN.split(url);
                 if (us != null && us.length > 0) {
@@ -348,6 +351,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 }
             } else { // assemble URL from register center's configuration
                 // if protocols not injvm checkRegistry
+                // 从注册中心获取服务提供者信息
                 if (!LOCAL_PROTOCOL.equalsIgnoreCase(getProtocol())) {
                     checkRegistry();
                     // 获取注册中心得信息

@@ -16,21 +16,12 @@
  */
 package org.apache.dubbo.demo.provider;
 
-import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.dubbo.config.ApplicationConfig;
-import org.apache.dubbo.config.ArgumentConfig;
-import org.apache.dubbo.config.MethodConfig;
-import org.apache.dubbo.config.ProtocolConfig;
 import org.apache.dubbo.config.ProviderConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.ServiceConfig;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
-
 import org.apache.dubbo.demo.DemoService;
-import org.apache.dubbo.rpc.Protocol;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

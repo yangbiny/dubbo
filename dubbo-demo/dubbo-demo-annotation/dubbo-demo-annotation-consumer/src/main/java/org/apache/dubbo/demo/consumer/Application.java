@@ -52,6 +52,8 @@ public class Application {
       ReferenceBean<DemoService> demoServiceReferenceBean = new ReferenceBean<>();
       demoServiceReferenceBean.setInterface(DemoService.class);
       demoServiceReferenceBean.setGroup("xx");
+      // scope可以指定是否是本地服务调用
+      //demoServiceReferenceBean.setScope("");
       return demoServiceReferenceBean;
     }
   }
