@@ -332,6 +332,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 logger.info("Using injvm service " + interfaceClass.getName());
             }
         } else {
+            // 清空地址信息
             urls.clear();
             // 如果用户有指定url，则进行点对点的调用
             if (url != null && url.length() > 0) { // user specified URL, could be peer-to-peer address, or register center's address.
@@ -353,6 +354,7 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 // if protocols not injvm checkRegistry
                 // 从注册中心获取服务提供者信息
                 if (!LOCAL_PROTOCOL.equalsIgnoreCase(getProtocol())) {
+                    // 从application中获取配置的注册中心的信息，并检查注册中心
                     checkRegistry();
                     // 获取注册中心得信息
                     List<URL> us = ConfigValidationUtils.loadRegistries(this, false);
