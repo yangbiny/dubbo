@@ -381,10 +381,12 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                 for (URL url : urls) {
                     invokers.add(REF_PROTOCOL.refer(interfaceClass, url));
                     if (UrlUtils.isRegistry(url)) {
-                        registryURL = url; // use last registry url
+                        // use last registry url
+                        registryURL = url;
                     }
                 }
-                if (registryURL != null) { // registry url is available
+                if (registryURL != null) {
+                    // registry url is available
                     // for multi-subscription scenario, use 'zone-aware' policy by default
                     String cluster = registryURL.getParameter(CLUSTER_KEY, ZoneAwareCluster.NAME);
                     // The invoker wrap sequence would be: ZoneAwareClusterInvoker(StaticDirectory) -> FailoverClusterInvoker(RegistryDirectory, routing happens here) -> Invoker
