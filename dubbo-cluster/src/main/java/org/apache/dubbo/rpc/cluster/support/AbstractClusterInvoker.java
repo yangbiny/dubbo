@@ -73,7 +73,6 @@ public abstract class AbstractClusterInvoker<T> implements ClusterInvoker<T> {
         if (directory == null) {
             throw new IllegalArgumentException("service directory == null");
         }
-
         this.directory = directory;
         //sticky: invoker.isAvailable() should always be checked before using when availablecheck is true.
         this.availablecheck = url.getParameter(CLUSTER_AVAILABLE_CHECK_KEY, DEFAULT_CLUSTER_AVAILABLE_CHECK);
