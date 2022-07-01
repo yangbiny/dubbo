@@ -108,8 +108,10 @@ public class RoundRobinLoadBalance extends AbstractLoadBalance {
                 //weight changed
                 weightedRoundRobin.setWeight(weight);
             }
+            // 增加当前对象的调用次数
             long cur = weightedRoundRobin.increaseCurrent();
             weightedRoundRobin.setLastUpdate(now);
+            // 如果当前的调用权重比当前最大的大，则说明
             if (cur > maxCurrent) {
                 maxCurrent = cur;
                 selectedInvoker = invoker;

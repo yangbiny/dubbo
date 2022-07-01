@@ -16,11 +16,13 @@
  */
 package org.apache.dubbo.demo;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface DemoService {
 
     String sayHello(String name);
+    String sayHello(List<String> name);
 
     default CompletableFuture<String> sayHelloAsync(String name) {
         return CompletableFuture.completedFuture(sayHello(name));

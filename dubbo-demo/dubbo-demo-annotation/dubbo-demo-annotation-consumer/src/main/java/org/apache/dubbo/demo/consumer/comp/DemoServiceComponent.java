@@ -16,6 +16,7 @@
  */
 package org.apache.dubbo.demo.consumer.comp;
 
+import java.util.List;
 import javax.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.demo.DemoService;
@@ -31,6 +32,11 @@ public class DemoServiceComponent implements DemoService {
   @Override
   public String sayHello(String name) {
     return demoService.sayHello(name);
+  }
+
+  @Override
+  public String sayHello(List<String> name) {
+    return null;
   }
 
   @Override

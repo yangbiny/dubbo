@@ -385,6 +385,8 @@ public class ReferenceConfig<T> extends ReferenceConfigBase<T> {
                         registryURL = url;
                     }
                 }
+
+                // 多个注册的地址，则使用负载均衡，然后生成一个invoker
                 if (registryURL != null) {
                     // registry url is available
                     // for multi-subscription scenario, use 'zone-aware' policy by default

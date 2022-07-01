@@ -51,6 +51,7 @@ public class MockClusterInvoker<T> implements ClusterInvoker<T> {
 
     @Override
     public URL getUrl() {
+
         return directory.getConsumerUrl();
     }
 
