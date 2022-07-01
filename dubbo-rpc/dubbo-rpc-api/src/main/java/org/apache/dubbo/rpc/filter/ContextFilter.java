@@ -17,6 +17,7 @@
 package org.apache.dubbo.rpc.filter;
 
 import org.apache.dubbo.common.extension.Activate;
+import org.apache.dubbo.common.extension.Adaptive;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.rpc.Filter;
 import org.apache.dubbo.rpc.Invocation;
@@ -55,6 +56,7 @@ import static org.apache.dubbo.rpc.Constants.TOKEN_KEY;
  *
  * @see RpcContext
  */
+@Adaptive
 @Activate(group = PROVIDER, order = -10000)
 public class ContextFilter implements Filter, Filter.Listener {
 

@@ -16,6 +16,7 @@
  */
 package org.apache.dubbo.demo.provider;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.dubbo.demo.DemoService;
 import org.apache.dubbo.rpc.RpcContext;
@@ -33,7 +34,12 @@ public class DemoServiceImpl implements DemoService {
         return "Hello " + name + ", response from provider: " + RpcContext.getContext().getLocalAddress();
     }
 
-    @Override
+  @Override
+  public String sayHello(List<String> name) {
+    return null;
+  }
+
+  @Override
     public CompletableFuture<String> sayHelloAsync(String name) {
         return null;
     }
